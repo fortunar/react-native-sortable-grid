@@ -100,6 +100,9 @@ class SortableGrid extends Component {
     this.tapIgnore         = false
     this.doubleTapWait     = false
 
+    // timeout to prevent blocks being stuck in animation when dragging for zero distance (click)
+    this.dragActveTimeout = null
+
     this.state = {
       gridLayout: null,
       blockPositions: [],
@@ -138,6 +141,7 @@ class SortableGrid extends Component {
   }
 
   onStartDrag = (evt, gestureState) => {
+
     if (this.state.activeBlock != null) {
       let activeBlockPosition = this._getActiveBlock().origin
       let x = activeBlockPosition.x - gestureState.x0
@@ -149,6 +153,11 @@ class SortableGrid extends Component {
   }
 
   onMoveBlock = (evt, {moveX, moveY, dx, dy}) => {
+    
+    if (this.dragActveTimeout) {
+      clearTimeout(this.dragActveTimeout);
+    }
+
     if (this.state.activeBlock != null && this._blockPositionsSet()) {
       if (this.state.deleteModeOn) {
         this.deleteModeMove({ x: moveX, y: moveY });
@@ -367,6 +376,12 @@ class SortableGrid extends Component {
   }
 
   activateDrag = (key) => () => {
+    if (this.dragActveTimeout) {
+      clearTimeout(this.dragActveTimeout);
+    }
+    this.dragActveTimeout = setTimeout(() => {
+      this.afterDragRelease();
+    }, 300);
     this.panCapture = true
     this.onDragStart( this.itemOrder[key] )
     this.setState({ activeBlock: key })

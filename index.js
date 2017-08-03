@@ -295,10 +295,12 @@ class SortableGrid extends Component {
   assessGridSize = ({nativeEvent}) => {
     if (this.props.itemWidth && this.props.itemWidth < nativeEvent.layout.width) {
       this.itemsPerRow = Math.floor(nativeEvent.layout.width / this.props.itemWidth)
+      this.actualBlockWidth = (nativeEvent.layout.width / this.itemsPerRow)
       this.blockWidth = (nativeEvent.layout.width / this.itemsPerRow) * 0.8
       this.blockHeight = this.props.itemHeight || this.blockWidth
     }
     else {
+      this.actualBlockWidth = (nativeEvent.layout.width / this.itemsPerRow)
       this.blockWidth = (nativeEvent.layout.width / this.itemsPerRow) * 0.8
       this.blockHeight = this.blockWidth
     }
@@ -351,7 +353,7 @@ class SortableGrid extends Component {
   setGhostPositions = () => {
     this.ghostBlocks = []
     this.reAssessGridRows()
-    let blockWidth = this.state.blockWidth
+    let blockWidth = this.state.actualBlockWidth
     let blockHeight = this.state.blockHeight
     let fullGridItemCount = this.rows * this.itemsPerRow
     let ghostBlockCount = fullGridItemCount - this.items.length
